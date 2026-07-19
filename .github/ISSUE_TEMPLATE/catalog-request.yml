@@ -1,13 +1,41 @@
 name: New catalog request
 description: Request a new Databricks catalog and access grants.
-title: "Catalog request: <catalog_name>"
+title: "Catalog request: <env>/<application_name>/<catalog_name>"
 labels:
   - catalog-request
 body:
   - type: markdown
     attributes:
       value: |
-        Fill this form to request a new catalog. The automation validates the catalog name and opens a pull request that updates `catalog.auto.tfvars`.
+        Fill this form to request a new catalog. The automation validates the request and opens a pull request that creates or updates `tfvars/<env>/<application_name>.tfvars`.
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Select the environment where this catalog should be created.
+      options:
+        - dev
+        - qa
+        - uat
+        - prod
+    validations:
+      required: true
+  - type: input
+    id: application_name
+    attributes:
+      label: Application name
+      description: Lowercase letters, numbers, hyphens, and underscores only. This decides the tfvars file name.
+      placeholder: sales_app
+    validations:
+      required: true
+  - type: input
+    id: catalog_url
+    attributes:
+      label: Catalog URL
+      description: Databricks workspace URL. For an existing application tfvars file, the existing value is kept if this is blank.
+      placeholder: https://adb-xxxxxxxxxxxxxxxx.x.azuredatabricks.net
+    validations:
+      required: false
   - type: input
     id: catalog_name
     attributes:

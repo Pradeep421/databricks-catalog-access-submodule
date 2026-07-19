@@ -5,12 +5,14 @@ on:
     paths:
       - "**.tf"
       - "**.tfvars"
+      - "tfvars/**/*.tfvars"
   push:
     branches:
       - main
     paths:
       - "**.tf"
       - "**.tfvars"
+      - "tfvars/**/*.tfvars"
 
 permissions:
   contents: read
@@ -22,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -35,14 +39,39 @@ jobs:
       - name: Terraform validate
         run: terraform validate
 
+      - name: Select tfvars files
+        id: tfvars
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          files=$(git diff --name-only "$base" "$GITHUB_SHA" -- 'tfvars/**/*.tfvars' '*.auto.tfvars' | tr '\n' ' ')
+          if [ -z "$files" ]; then
+            files="catalog.auto.tfvars"
+          fi
+
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+
       - name: Terraform plan
         if: github.event_name == 'pull_request'
-        run: terraform plan
+        shell: bash
+        run: |
+          for file in ${{ steps.tfvars.outputs.files }}; do
+            terraform plan -var-file="$file"
+          done
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
       - name: Terraform apply
         if: github.event_name == 'push'
-        run: terraform apply -auto-approve
+        shell: bash
+        run: |
+          for file in ${{ steps.tfvars.outputs.files }}; do
+            terraform apply -auto-approve -var-file="$file"
+          done
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}

@@ -31,12 +31,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: catalog-request/${{ steps.request.outputs.catalog_name }}
-          title: Add catalog ${{ steps.request.outputs.catalog_name }}
-          commit-message: Add catalog ${{ steps.request.outputs.catalog_name }}
+          title: Add ${{ steps.request.outputs.env }} catalog ${{ steps.request.outputs.catalog_name }} for ${{ steps.request.outputs.application_name }}
+          commit-message: Add ${{ steps.request.outputs.env }} catalog ${{ steps.request.outputs.catalog_name }} for ${{ steps.request.outputs.application_name }}
           body: |
             Created from #${{ github.event.issue.number }}.
 
-            This PR updates `catalog.auto.tfvars` with the requested catalog and access grants.
+            This PR updates `${{ steps.request.outputs.tfvars_file }}` with the requested catalog and access grants.
           labels: catalog-request
 
       - name: Comment on issue
@@ -47,5 +47,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Catalog request validated. A pull request has been opened with the tfvars change.'
+              body: 'Catalog request validated. A pull request has been opened with the application tfvars change.'
             })
