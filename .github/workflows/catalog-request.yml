@@ -1,0 +1,51 @@
+name: Catalog request
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-catalog-pr:
+    if: contains(github.event.issue.labels.*.name, 'catalog-request')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build tfvars update
+        id: request
+        run: |
+          python scripts/add_catalog_request.py \
+            --issue-body-file "$GITHUB_EVENT_PATH"
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: catalog-request/${{ steps.request.outputs.catalog_name }}
+          title: Add catalog ${{ steps.request.outputs.catalog_name }}
+          commit-message: Add catalog ${{ steps.request.outputs.catalog_name }}
+          body: |
+            Created from #${{ github.event.issue.number }}.
+
+            This PR updates `catalog.auto.tfvars` with the requested catalog and access grants.
+          labels: catalog-request
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Catalog request validated. A pull request has been opened with the tfvars change.'
+            })

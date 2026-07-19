@@ -1,0 +1,66 @@
+name: New catalog request
+description: Request a new Databricks catalog and access grants.
+title: "Catalog request: <catalog_name>"
+labels:
+  - catalog-request
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill this form to request a new catalog. The automation validates the catalog name and opens a pull request that updates `catalog.auto.tfvars`.
+  - type: input
+    id: catalog_name
+    attributes:
+      label: Catalog name
+      description: Lowercase letters, numbers, and underscores only. Example: `ad_catalog_sales_dev`.
+      placeholder: ad_catalog_sales_dev
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: Catalog owner. Leave as the current default if ownership does not change.
+      placeholder: dev_owner
+    validations:
+      required: true
+  - type: input
+    id: tag
+    attributes:
+      label: Tag
+      description: Environment or ownership tag.
+      placeholder: dev
+    validations:
+      required: false
+  - type: textarea
+    id: group_readers
+    attributes:
+      label: AD reader groups
+      description: One group per line.
+      placeholder: ad_reader_group_dev
+    validations:
+      required: false
+  - type: textarea
+    id: group_editors
+    attributes:
+      label: AD editor groups
+      description: One group per line.
+      placeholder: ad_editor_group_dev
+    validations:
+      required: false
+  - type: textarea
+    id: spn_readers
+    attributes:
+      label: SPN readers
+      description: One service principal or user per line.
+      placeholder: dev.user1
+    validations:
+      required: false
+  - type: textarea
+    id: spn_editors
+    attributes:
+      label: SPN editors
+      description: One service principal or user per line.
+      placeholder: dev.editor1
+    validations:
+      required: false
