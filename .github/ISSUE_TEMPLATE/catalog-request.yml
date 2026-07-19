@@ -40,7 +40,7 @@ body:
     id: catalog_name
     attributes:
       label: Catalog name
-      description: Lowercase letters, numbers, and underscores only. Example: `ad_catalog_sales_dev`.
+      description: "Lowercase letters, numbers, and underscores only. Example: `ad_catalog_sales_dev`."
       placeholder: ad_catalog_sales_dev
     validations:
       required: true
