@@ -1,5 +1,5 @@
 module "catalog_access" {
-  source = "../databricks-catalog-access-main"
+  source = "https://github.com/Pradeep421/databricks-catalog-access-main.git"
 
   catalog_url = var.catalog_url
   owner       = var.owner
